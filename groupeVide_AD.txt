@@ -1,0 +1,39 @@
+Ce que l'on cherche à faire : récupérer la liste de tous les groupes, et, pour chaque groupe, lister le nom de ceux qui sont vides.
+
+Le bout de code suivant permet d'exécuter une action sur tous les groupes avec 0 membre :
+
+Get-ADGroup -Filter * | Foreach{ 
+
+          if($((Get-ADGroupMember -Identity $_).Count) -eq 0){
+              <action à réaliser>
+          }
+}
+
+
+Ensuite, il ne reste plus qu'à afficher le nombre du groupe dans la console, ou d'ajouter son nom dans un fichier, ce qui donne :
+
+Get-ADGroup -Filter * | Foreach{ 
+
+          if($((Get-ADGroupMember -Identity $_).Count) -eq 0){
+
+                Write-Output "Groupe $_"
+                Add-Content -Path "C:\Log_GroupsEmpty.log" -Value $_
+          }
+}
+
+
+
+Enfin, nous pouvons aller plus loin en supprimant les groupes vides grâce à la commande Remove-ADGroup. Grâce au fichier de log, nous aurons une liste des groupes supprimés.
+
+Pour supprimer les groupes vides de l'Active Directory, cela donne :
+
+Get-ADGroup -Filter * | Foreach{ 
+
+          if($((Get-ADGroupMember -Identity $_).Count) -eq 0){
+
+                Write-Output "Groupe $_"
+                Add-Content -Path "C:\Log_GroupsEmpty.log" -Value $_
+
+                Remove-ADGroup -Identity $_ -Confirm:$false
+          }
+}
